@@ -1,0 +1,14 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=IntelliJ IDEA
+
+### 공지사항 등록 테스트
+POST http://localhost:8081/notifications
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "title": "별표나와라",
+  "content": "이 글이 목록에 뜨면 오늘 마라톤 완주입니다!",
+  "isImportant": true
+}

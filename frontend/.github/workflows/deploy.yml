@@ -1,0 +1,63 @@
+name: Deploy React to EKS
+
+on:
+  push:
+    branches:
+      - development
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REGISTRY: <YOUR_ECR_REGISTRY>
+  ECR_REPOSITORY: my-project-nginx
+  EKS_CLUSTER_NAME: my-cluster
+  K8S_DEPLOYMENT_NAME: nginx
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: AWS 인증
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ECR 로그인
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Docker 이미지 빌드
+        run: |
+          docker build \
+            --build-arg VITE_SPRING_API_BASE_URL=${{ secrets.VITE_SPRING_API_BASE_URL }} \
+            --build-arg VITE_CHATBOT_API_BASE_URL=${{ secrets.VITE_CHATBOT_API_BASE_URL }} \
+            --build-arg VITE_TOSS_API_CLIENT_KEY=${{ secrets.VITE_TOSS_API_CLIENT_KEY }} \
+            --build-arg VITE_NAVER_LOGIN_API_URL=${{ secrets.VITE_NAVER_LOGIN_API_URL }} \
+            --build-arg VITE_KAKAO_REDIRECT_URI=${{ secrets.VITE_KAKAO_REDIRECT_URI }} \
+            --build-arg VITE_KAKAO_CLIENT_ID=${{ secrets.VITE_KAKAO_CLIENT_ID }} \
+            -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
+
+      - name: Docker 이미지 ECR Push
+        run: |
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+
+      - name: kubectl 설치
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: EKS kubeconfig 설정
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name ${{ env.EKS_CLUSTER_NAME }}
+
+      - name: EKS 배포
+        run: |
+          kubectl rollout restart deployment ${{ env.K8S_DEPLOYMENT_NAME }}
+          kubectl rollout status deployment ${{ env.K8S_DEPLOYMENT_NAME }}
