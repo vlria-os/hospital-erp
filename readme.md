@@ -8,13 +8,19 @@ AI 진단 보조 기능과 AWS EKS 기반 컨테이너 배포 환경을 적용�
 ## 📷 Preview
 
 ### 메인 페이지
-![Preview1](docs/images/main.png)
+<p align="center">
+  <img src="docs/images/main.png" width="900">
+</p>
 
 ### 예약 관리
-![Preview2](docs/images/reservation.png)
+<p align="center">
+  <img src="docs/images/reservation.png" width="900">
+</p>
 
 ### 진료 관리 및 AI 진단 보조
-![Preview3](docs/images/ai.png)
+<p align="center">
+  <img src="docs/images/medical-ai.png" width="900">
+</p>
 
 ---
 
