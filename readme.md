@@ -5,6 +5,19 @@ AI 진단 보조 기능과 AWS EKS 기반 컨테이너 배포 환경을 적용�
 
 ---
 
+## 📷 Preview
+
+### 메인 페이지
+![Preview1](docs/images/main.png)
+
+### 예약 관리
+![Preview2](docs/images/reservation.png)
+
+### 진료 관리 및 AI 진단 보조
+![Preview3](docs/images/ai.png)
+
+---
+
 # 1. 프로젝트 소개
 
 Hospital ERP는 병원의 예약, 접수, 진료, 수납 업무를 하나의 시스템으로 관리하기 위해 개발한 팀 프로젝트입니다.
@@ -999,7 +1012,7 @@ Access Token 재발급 요청 시 JWT 유효성을 확인한 뒤 Redis에 저장
 
 로그아웃 시에는 Cookie와 Redis의 Refresh Token을 함께 삭제하여 기존 토큰을 이용한 재발급을 방지했습니다.
 
-![AWS Architecture](docs/images/JWT-architecture.svg)
+![JWT Architecture](docs/images/JWT-architecture.svg)
 
 ### 주요 구현
 
@@ -1245,7 +1258,3 @@ Replica를 조정한 환경에서 Rolling Update를 수행한 결과, 신규 Pod
 이번 경험을 통해 Kubernetes Rolling Update는 배포 과정에서 일시적으로 추가 리소스를 필요로 하므로, 안정적인 배포를 위해서는 운영 중인 Pod뿐만 아니라 신규 Pod가 생성될 수 있는 여유 리소스를 함께 고려해야 함을 확인하였다.
 
 ---
-
-# 12. 프로젝트 화면
-
-이미지 중심으로 유지 
