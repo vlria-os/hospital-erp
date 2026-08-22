@@ -8,16 +8,19 @@ AI 진단 보조 기능과 AWS EKS 기반 컨테이너 배포 환경을 적용�
 ## 📷 Preview
 
 ### 메인 페이지
+환자용 메인 화면으로 예약, AI 문의, 공지사항 기능을 제공합니다.
 <p align="center">
   <img src="docs/images/main.png" width="900">
 </p>
 
 ### 예약 관리
+진료과와 담당의를 지정하여 예약을 관리합니다.
 <p align="center">
   <img src="docs/images/reservation.png" width="900">
 </p>
 
 ### 진료 관리 및 AI 진단 보조
+환자 진료기록과 AI 진단 보조 결과를 함께 제공합니다.
 <p align="center">
   <img src="docs/images/medical-ai.png" width="900">
 </p>
@@ -73,7 +76,7 @@ Hospital ERP는 병원의 예약, 접수, 진료, 수납 업무를 하나의 시
 - UI 설계
 - Git 기반 형상 관리
 
-### Backend
+### Spring Boot Backend
 
 - 예약 → 확정 → 접수 → 진료 프로세스 구현
 - Redis 기반 예약 동시성 제어
@@ -154,6 +157,8 @@ Hospital ERP는 병원의 예약, 접수, 진료, 수납 업무를 하나의 시
 - CloudWatch 모니터링
 - Lambda + Amazon S3 기반 로그 백업
 
+---
+
 # 4. 기술 스택
 
 ## Backend
@@ -222,7 +227,7 @@ Hospital ERP는 병원의 예약, 접수, 진료, 수납 업무를 하나의 시
 
 # 5. 시스템 아키텍처
 
-![System Architecture](docs/images/service-architecture.svg)
+![System Architecture](docs/images/service-architecture.drawio.svg)
 
 ## 시스템 구성
 
@@ -287,6 +292,8 @@ AI 진단 보조 기능은 별도의 FastAPI 서비스로 분리했습니다. Sp
 - AI
 
 각 기능을 독립적인 도메인으로 구성하여 유지보수성과 확장성을 고려했습니다.
+
+---
 
 # 7. 주요 구현
 
@@ -664,7 +671,7 @@ Spring Security와 JWT를 활용하여 Stateless 인증 구조를 구성했습�
 
 먼저 현재 진료과의 진료기록을 우선 조회하고, LLM이 추가 정보가 필요하다고 판단하는 경우 관련성이 높은 다른 진료과를 최대 2개까지 선택하여 추가 진료기록을 조회합니다.
 
-조회된 진료기록은 FAISS를 이용해 현재 증상과 유사한 기록을 검색하고, 검색 결과를 현재 증상과 함께 LLM에 전달하여 질환 후보, 추가 검사, 처방 정보를 생성하도록 구성했습니다.
+조회된 진료기록은 FAISS를 이용해 현재 증상과 유사한 기록을 검색하고, 검색 결과를 현재 증상과 함께 LLM에 전달하여 질환 후보, 추가 검사를 생성하도록 구성했습니다.
 
 모든 진료기록을 그대로 활용하는 대신 현재 증상과 관련성이 높은 의료정보만 선별하여 AI 진단에 활용하도록 설계했습니다.
 
@@ -673,7 +680,7 @@ Spring Security와 JWT를 활용하여 Stateless 인증 구조를 구성했습�
 - 환자의 과거 진료기록 기반 AI 진단 보조
 - LLM 기반 추가 진료과 판단
 - FAISS 기반 유사 진료기록 검색
-- 질환 후보, 추가 검사 및 처방 정보 생성
+- 질환 후보 및 추가 검사 정보 생성
 
 ---
 
@@ -713,7 +720,7 @@ FAISS 기반 유사 진료기록 검색
 LLM 진단 보조
         │
         ▼
-질환 후보 / 추가 검사 / 처방 정보 제공
+질환 후보 / 추가 검사 정보 제공
 ```
 
 ### 주요 구현
@@ -745,7 +752,7 @@ FastAPI
       │
 진료기록 조회
       │
-FAISS 검색
+유사 진료기록 검색(FAISS)
       │
 LLM 진단
       ▼
@@ -769,7 +776,7 @@ Spring Boot
 
 검색된 진료기록을 LLM의 Context로 활용하는 **RAG(Retrieval-Augmented Generation)** 구조를 적용했습니다.
 
-환자의 진료기록을 임베딩한 뒤 FAISS를 이용해 현재 증상과 유사한 기록만 검색하고, 검색 결과를 현재 증상과 함께 LLM에 전달하여 질환 후보와 추가 검사, 처방 정보를 생성하도록 구성했습니다.
+환자의 진료기록을 임베딩한 뒤 FAISS를 이용해 현재 증상과 유사한 기록만 검색하고, 검색 결과를 현재 증상과 함께 LLM에 전달하여 질환 후보와 추가 검사 정보를 생성하도록 구성했습니다.
 
 모든 진료기록을 LLM에 전달하는 대신 필요한 정보만 Context로 제공하여 토큰 사용량을 줄이고, 보다 관련성 높은 진단 보조 결과를 생성할 수 있도록 설계했습니다.
 
@@ -857,6 +864,8 @@ final_response = llm.invoke(final_prompt)
 
 > 전체 코드
 > [`ai/main.py`](ai/main.py)
+
+---
 
 # 9. AWS / DevOps
 
@@ -1108,7 +1117,6 @@ Refresh Token을 서버에서 관리하지 않으면 탈취된 토큰을 만료 
 > [`ApiLoginSuccessHandler.java`](backend/src/main/java/com/example/demo/security/handler/ApiLoginSuccessHandler.java)
 > [`ApiRefreshController.java`](backend/src/main/java/com/example/demo/security/controller/ApiRefreshController.java)
 > [`RedisService.java`](backend/src/main/java/com/example/demo/security/redis/RedisService.java)
-
 
 ---
 
